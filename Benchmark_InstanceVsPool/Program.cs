@@ -104,17 +104,23 @@ long Run(TestAction act, int it, int lt)
     return totalCount;
 }
 
+void Print(string msg)
+{
+    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {msg}");
+}
+
+
 using var fs = new FileStream($"d:/test.{DateTime.Now.Ticks}.txt", FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
 using var writer = new StreamWriter(fs);
 
 foreach (var threadCount in ThreadCounts)
 {
     MultiThreadTester.Init(threadCount);
-    Console.WriteLine("#Threads " + threadCount);
+    Print("#Threads " + threadCount);
 
     foreach (var objSize in ObjectSizes)
     {
-        Console.WriteLine("#ObjSize " + objSize);
+        Print("#ObjSize " + objSize);
         int poolSize = threadCount;
         elemSize = objSize / nintSize;
         var newFunc = () => new nint[elemSize];
@@ -133,7 +139,7 @@ foreach (var threadCount in ThreadCounts)
         foreach (var testtime in TestTimes)
         {
             var lifetime = testtime / (ObjectSizes.Length * ThreadCounts.Length * Iteration);
-            Console.WriteLine($"#Lifetime {lifetime} ({testtime})");
+            Print($"#Lifetime {lifetime} ({testtime})");
 
             var a = Run(funcA, Iteration, lifetime);
             var b = Run(funcB, Iteration, lifetime);
@@ -143,7 +149,7 @@ foreach (var threadCount in ThreadCounts)
             var f = Run(funcF, Iteration, lifetime);
 
             var msg = $"{threadCount,2} {objSize,5} {lifetime,5} {a,20:N0} {b,20:N0} {c,20:N0} {d,20:N0} {e,20:N0} {f,20:N0}";
-            Console.WriteLine(msg);
+            Print(msg);
             writer.WriteLine(msg);
             writer.Flush();
         }
